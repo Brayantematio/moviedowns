@@ -9,6 +9,7 @@ commande pour utiliser movieDown sur Termux
 - pip install django
 - pip install yt_dlp
 - git clone git@github.com:Brayantematio/moviedowns.git
+- cd moviedown
 - cd videoTelexharg
 - python manage.py makemigrations
 - Python manage.py migrate
