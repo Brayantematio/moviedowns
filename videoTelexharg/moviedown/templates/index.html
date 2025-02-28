@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -5,10 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DownMovieSocial</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="{% static  'image/logo.png' %}" type="image/x-icon">
     <style>
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
         }
 
         .navbar {
@@ -36,24 +40,32 @@
             background-position: center;
             color: white;
             text-align: center;
-            padding: 100px 20px;
+            padding: 120px 20px;
         }
 
         .hero h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 20px;
+            font-weight: 700;
         }
 
         .hero p {
             font-size: 1.2rem;
+            font-weight: 500;
+            line-height: 1.6;
         }
 
         .form-container {
             margin-top: -50px;
-            padding: 30px;
+            padding: 40px;
             background-color: #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 8px;
+            transition: transform 0.3s;
+        }
+
+        .form-container:hover {
+            transform: translateY(-5px);
         }
 
         .footer {
@@ -70,6 +82,70 @@
 
         .footer a:hover {
             text-decoration: underline;
+        }
+
+        h2 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #007bff;
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .video-container {
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        .video-player {
+            border: 5px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            max-width: 100%;
+        }
+
+        .video-player:hover {
+            transform: scale(1.03);
+            box-shadow: 0px 6px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        #progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 10px;
+            height: 20px;
+            margin-top: 20px;
+        }
+
+        #progress-bar-fill {
+            height: 100%;
+            background-color: #4caf50;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .video-container {
+                max-width: 95%;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -122,19 +198,56 @@
         {% if message %}
             <div class="alert alert-info mt-4">{{ message }}</div>
         {% endif %}
+
+        <!-- Progress Bar -->
+        <div id="progress-bar">
+            <div id="progress-bar-fill">0%</div>
+        </div>
+
+        {% if video_url %}
+            <h2 class="mt-4">Votre vidéo téléchargée :</h2>
+            <div class="video-container">
+                <video class="video-player" width="640" height="360" controls>
+                    <source src="/media/{{ video_url }}" type="video/mp4">
+                    Votre navigateur ne prend pas en charge la balise vidéo.
+                </video>
+            </div>
+        {% endif %}
     </div>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 DownMovieSocial. Tous droits réservés. | <a href="" onclick="politique()">Politique de confidentialité</a></p>
+            <p>&copy; 2025 DownMovieSocial. Tous droits réservés. | <a href="#">Politique de confidentialité</a></p>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    <!-- Script pour la mise à jour de la barre de progression -->
     <script>
-      
+        function updateProgress(percent) {
+            const progressBar = document.getElementById('progress-bar-fill');
+            progressBar.style.width = percent + '%';
+            progressBar.innerText = percent + '%';
+        }
+    
+        function fetchProgress() {
+            fetch('/get_progress/')  // Faire une requête à l'URL get_progress
+                .then(response => response.json())
+                .then(data => {
+                    if (data.percent !== undefined) {
+                        updateProgress(data.percent);  // Mettre à jour la barre de progression
+                    }
+                    if (data.percent < 100) {
+                        setTimeout(fetchProgress, 1000);  // Réessayer toutes les secondes jusqu'à ce que ce soit 100%
+                    }
+                });
+        }
+    
+        // Démarrer la récupération de la progression après l'envoi du formulaire
+        fetchProgress();
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
+                </html>
+                
